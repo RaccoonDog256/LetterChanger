@@ -1,5 +1,5 @@
-
 const replaceText = (node) => {
+  if (node) { console.log("ㅤ", node) }
   if (node.nodeType === Node.TEXT_NODE) {
     node.nodeValue = node.nodeValue.replace(/〆/g, "までだよ🐼");
   } else {
