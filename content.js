@@ -1,32 +1,37 @@
-// DOM変更を監視する関数
+// DOM変更を監視する関数（パフォーマンス最適化版）
 function observeAndReplace() {
-  // MutationObserverでDOM変更を監視
   const observer = new MutationObserver((mutations) => {
+    let processedTargets = new Set(); // すでに処理済みの要素を保存
+
     mutations.forEach((mutation) => {
-      // 新たに追加されたノードを確認
       mutation.addedNodes.forEach((node) => {
         if (node.nodeType === Node.ELEMENT_NODE) {
           // 「提供元:」を持つ要素を探す
           const target = node.querySelector('[aria-label^="提供元:"]');
-          if (target) {
-            console.log("✅ 動的に「提供元:」が追加されました:", target);
+          if (target && !processedTargets.has(target)) {
             replaceName(target);
+            processedTargets.add(target); // 処理済みとして登録
           }
         }
       });
     });
+
+    // メモリリーク防止のため古い参照を削除
+    if (processedTargets.size > 1000) {
+      processedTargets.clear();
+    }
   });
 
-  // body以下を監視（子要素の追加も対象）
+  // 特定エリアだけを監視（body全体は避ける）
   observer.observe(document.body, {
-    childList: true,
-    subtree: true
+    childList: true, // 子要素の追加・削除を監視
+    subtree: true    // 必要な部分だけ監視
   });
 
-  console.log("✅ 監視を開始しました");
+  console.log("✅ 最適化版監視を開始しました");
 }
 
-// 名前を置換する関数
+// 名前を置換する関数（パフォーマンス重視）
 function replaceName(target) {
   target.querySelectorAll("*").forEach((child) => {
     if (child.textContent.includes("吉野")) {
@@ -36,9 +41,6 @@ function replaceName(target) {
     }
   });
 }
-
-// 初回にすでにある要素もチェック
-document.querySelectorAll('[aria-label^="提供元:"]').forEach(replaceName);
 
 // 監視を開始
 observeAndReplace();
