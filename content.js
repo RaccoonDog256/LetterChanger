@@ -6,8 +6,8 @@ function observeAndReplace() {
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => {
         if (node.nodeType === Node.ELEMENT_NODE) {
-          // 「提供元:」を持つ要素を探す
-          const target = node.querySelector('[aria-label^="提供元:"]');
+          // id="focused" のdivタグを探す
+          const target = node.querySelector('div#focused');
           if (target && !processedTargets.has(target)) {
             replaceName(target);
             processedTargets.add(target); // 処理済みとして登録
